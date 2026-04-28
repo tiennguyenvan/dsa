@@ -1,18 +1,35 @@
 class Solution:
-    def shortestSubarray(self, nums: List[int], k: int) -> int:
-        minVal = min(nums)
-        realNums = [val - minVal for val in nums]
-        realK = k - minVal
+    def shortestSubarray(self, nums: List[int], k: int) -> int:       
+        t = 0
+        sums = []
+        for i,n in enumerate(nums):                        
+            if n >= k:            
+                return 1
+            sums.append((t,i))             
+            t+=n            
+        # print(sums)
         q = deque()
-        total = 0
         l = len(nums) + 1
-        for n in realNums:
-            q.append(n)
-            total += n
-            if total >= realK:
-                l = min(l, len(q))
-            while total > realK:
+        def valid_sum_front(s,q0,n,k):
+            if not len(q):
+                return False
+            s_f = s - q0 + n
+            # if s_f >= k:
+                # print('        Sum front?', s, '-', q0, '+', n,'=',s_f)                
+            return s - q0 + n >= k
+        for s in sums:            
+            i = s[1]
+            t = s[0]
+            n = nums[i]
+            # print('i =',i,'t =',t,'n =', n, q)
+            while len(q) and valid_sum_front(t, q[0][0], n, k):
                 left = q.popleft()
-                total -= left            
-                
-        return l if l < len(nums) + 1 else -1
+                l = min(l, i - left[1]+1)                
+                # print('    Front: ', l, q )                
+            while len(q) and q[-1][0] >= t:
+                q.pop()
+                # print('    Back: ', q)
+            q.append(s)
+            # print('    ', s,'==>', q)
+        return -1 if l > len(nums) else l
+            
