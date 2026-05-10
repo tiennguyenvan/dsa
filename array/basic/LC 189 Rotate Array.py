@@ -7,26 +7,25 @@ class Solution:
             while b != 0:
                 a, b = b, a % b
             return a        
-        c = gcd(n,k)
-
-        pending = (nums[0], 0)
         n = len(nums)
-        circle_reset_size = n
-        if k % n == 0:
-            circle_reset_size = 1
-        elif n % k == 0:
-            circle_reset_size = n // k
-        
-
-        circle_reset_checker = circle_reset_size
+        c = gcd(n,k)
+        cirle_size = n // c
+        pending = (0, nums[0])
+        circle_check = cirle_size
+        # print(cirle_size)
         for i in range(n):            
-            target_i = (pending[1] + k) % n
+            target_i = (pending[0] + k) % n
             target_val = nums[target_i]
-            nums[target_i] = pending[0]
-            circle_reset_checker -= 1
-            pending = (target_val, target_i + (1 if circle_reset_checker == 0 else 0))
-            if circle_reset_checker == 0:
-                circle_reset_checker = circle_reset_size
+            nums[target_i] = pending[1]
+            circle_check -= 1
+            if circle_check == 0:
+                circle_check = cirle_size
+                target_i = (target_i + 1) % n
+                target_val = nums[target_i]
+
+            pending = (target_i, target_val)
+            
+            # print(i, nums, pending, circle_check)
 
         
 
