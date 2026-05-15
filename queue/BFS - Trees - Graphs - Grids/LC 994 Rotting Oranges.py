@@ -1,40 +1,39 @@
 class Solution:
     def orangesRotting(self, grid: List[List[int]]) -> int:
-        # pick all rotted oranges to start with
+        freshMap = Counter()       
         q = deque()
-        fresh = 0
-        for i,row in enumerate(grid):
-            for j,cell in enumerate(row):
-                if cell == 2:
-                    q.append((i,j))
-                    continue
-                if cell == 1:
-                    fresh+=1
-        if fresh == 0: return 0
-        if len(q) == 0: return -1
-        time = 0
-        # print(q, fresh)
-        dirs = [(1,0), (-1,0), (0,-1), (0,1)]
+        nr = len(grid)
+        nc = len(grid[0])
         
-        while q:
-            time += 1
-            bk_fresh = fresh
-            l = len(q)
-            # print(time)
-            for _ in range(l):
-                (i,j) = q.popleft()
-                # print(i,j)
-                for a,b in dirs:
-                    x = i + a
-                    y = j + b
-                    # print(f'  {x}, {y}')
-                    is_fresh = x >= 0 and x < len(grid) and y >= 0 and y < len(grid[0]) and grid[x][y] == 1
-                    if is_fresh:
-                        grid[x][y] = 2
-                        q.append((x,y))
-                        fresh -= 1
-                        if fresh == 0: return time
-                        
-            # print(grid, fresh)
-            if bk_fresh == fresh: return -1
-        return time
+        for i in range(nr):
+            for j in range(nc):
+                o = grid[i][j]
+                if o == 0:
+                    continue
+                if o == 1:
+                    freshMap[(i,j)] = 1
+                if o == 2:
+                    q.append((i,j))
+
+        minutes = 0
+        dirs = [(1,0), (-1,0), (0,1), (0,-1)]
+        while q and len(freshMap):
+            ql = len(q)
+            for qi in range(ql):
+                i,j = q.popleft()
+                grid[i][j] = 0
+                for d in dirs:
+                    r, c = i+d[0], j+d[1]                    
+                    if r < 0 or r >= nr or c < 0 or c >= nc:
+                        continue
+                    if grid[r][c] == 0 :
+                        continue
+                    if grid[r][c] == 1:
+                        del freshMap[(r,c)]
+                        q.append((r,c))
+            if not q: 
+                break
+            minutes+=1           
+        
+        
+        return minutes if len(freshMap) == 0 else -1
