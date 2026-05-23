@@ -29,6 +29,8 @@ class Solution:
             replaceChild(foundParent, found, found.right)
             return head.left
 
+        # now we process the left and right of the found
+        # based on the nature of the BST
         # parent.left -> found.left, maxLeft.right -> found.right
         if foundParent.left == found:
             maxLeft = found.left
