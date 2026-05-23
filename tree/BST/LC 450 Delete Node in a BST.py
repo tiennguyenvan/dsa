@@ -19,8 +19,7 @@ class Solution:
         found = root
         while found and found.val != key:
             foundParent = found
-            found = found.right if key > found.val else found.left
-        # print(f"Found: ({v(foundParent)})->${v(found)}")
+            found = found.right if key > found.val else found.left        
 
         if not found: return head.left
         if not found.right:
