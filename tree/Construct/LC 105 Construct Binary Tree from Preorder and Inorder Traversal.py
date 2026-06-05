@@ -9,19 +9,36 @@ class Solution:
         v2i = {}
         for i,v in enumerate(inorder):
             v2i[v] = i
-        n = len(preorder)        
-        def build(s,l,r):            
-            if l >= r:  
-                return None
-            v = preorder[s]
-            root = TreeNode(v)
-            m = v2i[v]          
-            ls = s+1
-            rs = s+1+m-l  
-            root.left = build(ls, l, m)                        
-            root.right = build(rs, m+1, r)            
+        p = -1
+        def build(l,r):
+            if l >= r:
+                return
+            nonlocal p
+            p+=1
+            root = TreeNode(preorder[p])
+            m = v2i[root.val]
+            root.left = build(l, m)
+            root.right = build(m+1, r)
             return root
-        return build(0, 0, n)
+        return build(0, len(preorder))
+
+
+        # v2i = {}
+        # for i,v in enumerate(inorder):
+        #     v2i[v] = i
+        # n = len(preorder)        
+        # def build(s,l,r):            
+        #     if l >= r:  
+        #         return None
+        #     v = preorder[s]
+        #     root = TreeNode(v)
+        #     m = v2i[v]          
+        #     ls = s+1
+        #     rs = s+1+m-l  
+        #     root.left = build(ls, l, m)                        
+        #     root.right = build(rs, m+1, r)            
+        #     return root
+        # return build(0, 0, n)
 
 
 
