@@ -13,14 +13,15 @@ class Codec:
         cur = root
         stack = []
         ret = []
-        while cur or stack:
-            ret.append(str(cur.val) if cur else '')
+        while cur or stack:            
             if cur:
                 stack.append(cur)
+                ret.append(str(cur.val))
                 cur = cur.left
                 continue
             cur = stack.pop()
-            cur = cur.right      
+            cur = cur.right    
+        print(ret)  
         return ','.join(ret)
 
     def deserialize(self, data: str) -> Optional[TreeNode]:
@@ -28,19 +29,41 @@ class Codec:
         """
         if not data:
             return None
-        vals = data.split(',')        
-        stack = []
-        while vals:
-            v = vals.pop()
-            if v == '':
-                stack.append(None)
-                continue
-            node = TreeNode(int(v))
-            node.left = stack.pop() if stack else None
-            node.right= stack.pop() if stack else None
-            stack.append(node)
+        i = 0        
+        vals = list(map(int, data.split(',')))        
+        n = len(vals)
+
+        def build(low,hi):
+            nonlocal i
+            if i >= n:
+                return None
+            val = vals[i]
+            if val < low or val > hi:
+                return None                
+            i+=1
+            root = TreeNode(val)
+            root.left = build(low,val)
+            root.right = build(val,hi)
+
+            return root
+            
+        return build(float("-inf"), float("inf"))
+        # if not data:
+        #     return None
+        # vals = data.split(',')        
+        # v = None
+        # stack = []
+        # while vals:
+        #     v = vals.pop()
+        #     if v == '':
+        #         stack.append(None)
+        #         continue
+        #     node = TreeNode(int(v))
+        #     node.left = stack.pop() if stack else None
+        #     node.right= stack.pop() if stack else None
+        #     stack.append(node)
         
-        return stack[0]
+        # return stack[0]
         
 
 # Your Codec object will be instantiated and called as such:
