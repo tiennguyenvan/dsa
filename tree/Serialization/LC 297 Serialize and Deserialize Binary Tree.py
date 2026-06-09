@@ -22,7 +22,7 @@ class Codec:
                 stack.append(cur)
                 cur = cur.left
                 continue
-            ret.append('_')
+            ret.append('')
             cur = stack.pop()
             cur = cur.right
         return ','.join(ret)
@@ -39,7 +39,7 @@ class Codec:
         vals = data.split(',')
         while vals:
             val = vals.pop()
-            if val == '_':
+            if val == '':
                 stack.append(None)
                 continue
             left = stack.pop()
