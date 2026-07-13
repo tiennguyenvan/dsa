@@ -33,3 +33,12 @@ class Solution:
             # print('    ', s,'==>', q)
         return -1 if l > len(nums) else l
             
+
+# Input
+# nums = [84,-37,32,40,95]
+# k = 167
+# [121, 0, 69, 77, 132] 204
+# Output
+# 2
+# Expected
+# 3
