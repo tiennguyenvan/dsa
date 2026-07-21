@@ -3,11 +3,17 @@ class Solution:
         """
         Do not return anything, modify nums in-place instead.
         """
+        def gcd(a,b):
+            while b != 0:
+                a, b = b, a % b
+            return a
+        
         n = len(nums)
-        if n == 0 or k > n and k % n == 0:
+        if not k or not n or k >= n and k % n == 0:
             return
-        k = k % n
-        segLen = n / k if n % k == 0 else 0
+        g = gcd(n,k)
+
+        segLen = n / g if g > 1 else 0
         seg = 0
         p = 0
         v = nums[p]
@@ -16,9 +22,11 @@ class Solution:
             t = nums[p]
             nums[p] = v
             v = t
-
+            if not segLen:
+                continue
             seg += 1
-            if seg >= segLen:
-                p += 1
-                v = nums[p]
-                seg = 0
+            if seg < segLen:
+                continue
+            p += 1
+            v = nums[p]
+            seg = 0
