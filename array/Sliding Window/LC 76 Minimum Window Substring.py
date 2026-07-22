@@ -1,37 +1,32 @@
 class Solution:
     def minWindow(self, s: str, t: str) -> str:
-        sc = Counter()
-        tc = Counter(t)
-        extra = Counter()
-        n = len(s)
-        left = 0
-        min_len = n + 1
-        min_left = -1
-        for right in range(n):
-            c = s[right]
-            # print(right, c)
-            if not tc[c]: continue
-            if sc[c] < tc[c]:
-                sc[c] += 1
-            else: 
-                extra[c] += 1
+        tCharCount = Counter(t)
+        tLen = len(t)
 
-            while left <= right and (sc == tc or not tc[s[left]]):                
-                lc = s[left]                
-                l = right + 1 - left
-                if sc == tc and l < min_len:
-                    min_len = l
-                    min_left = left
-                left+=1 
-                if not tc[lc]:
-                    continue
-                if extra[lc]:
-                    extra[lc] -=1
-                    continue
-                sc[lc]-=1
+        left = minLeft = 0
+        minLen = len(s) + 1
 
-            # print((left, min_left, min_len), sc, extra)
-        
-        return s[min_left:min_left+min_len] if min_left != -1 else ''
+        for right, sChar in enumerate(s):
+            if tCharCount[sChar] > 0:
+                tLen -= 1
+            tCharCount[sChar] -= 1
+
+            if tLen:
+                continue            
+            
+            while tCharCount[s[left]] < 0:
+                tCharCount[s[left]] += 1
+                left += 1
+                
+            foundLen = right + 1 - left
+            if foundLen < minLen:
+                minLen, minLeft = foundLen, left
+
+            roomToExpand = 1
+            tCharCount[s[left]] += roomToExpand
+            left += 1
+            tLen += 1
+
+        return s[minLeft:minLeft+minLen] if minLen < len(s) + 1 else ''
 
 
