@@ -1,47 +1,37 @@
 class Solution:
     def minWindow(self, s: str, t: str) -> str:
-        l = 0
-        n = len(s)
+        sc = Counter()
         tc = Counter(t)
-        wc = Counter()
-        xc = Counter()
-        print(f"tc: {tc}")
+        extra = Counter()
+        n = len(s)
+        left = 0
+        min_len = n + 1
+        min_left = -1
+        for right in range(n):
+            c = s[right]
+            # print(right, c)
+            if not tc[c]: continue
+            if sc[c] < tc[c]:
+                sc[c] += 1
+            else: 
+                extra[c] += 1
 
-        min_ij = (0,0)
-        min_len = n+1
+            while left <= right and (sc == tc or not tc[s[left]]):                
+                lc = s[left]                
+                l = right + 1 - left
+                if sc == tc and l < min_len:
+                    min_len = l
+                    min_left = left
+                left+=1 
+                if not tc[lc]:
+                    continue
+                if extra[lc]:
+                    extra[lc] -=1
+                    continue
+                sc[lc]-=1
 
-        for r,c in enumerate(s):
-            if c not in tc:
-                xc[c] += 1
-                # print(f'r,c={(r,c)}, xc:{xc}')    
-                continue
-
-            if wc[c] == tc[c]:
-                xc[c] += 1
-            else:
-                wc[c] += 1
-            # print(f'r,c={(r,c)}, wc:{wc}, xc:{xc}')
-
-            # remove duplications
-            while wc == tc:  
-                cur_len = r - l + 1
-                if cur_len < min_len:
-                    min_ij = (l,r)           
-                    min_len = cur_len
-                # print(f'    Found: cur_len={cur_len}, min_len={min_len}, min_ij={min_ij}')
-                lc = s[l]
-                if xc[lc]: 
-                    xc[lc]-=1
-                else: 
-                    wc[lc] -= 1
-                l+=1
-            
-            
-        return "" if min_len == n + 1 else s[min_ij[0]:min_ij[1]+1]
-
-# add this to remove overload at end of runtime => speed up run time
-__import__("atexit").register(lambda: open("display_runtime.txt", "w").write("0"))
-
-
+            # print((left, min_left, min_len), sc, extra)
+        
+        return s[min_left:min_left+min_len] if min_left != -1 else ''
 
 
