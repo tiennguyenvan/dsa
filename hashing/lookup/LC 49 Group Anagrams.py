@@ -1,16 +1,17 @@
 class Solution:
-    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
-        def hashId(s):
-            sMap = [0]*26
-            for c in s:                
-                sMap[ord(c)-ord('a')] += 1
-            return ','.join(map(str,sMap))
+    def hash(self, word:str) -> str:
+        key = [0]*26
+        for code in word.encode():
+            key[code - ord('a')] += 1
+        return ','.join(map(str,key))
 
-        sMap = {}
-        for s in strs:
-            sid = hashId(s)
-            if sid not in sMap:
-                sMap[sid] = []
-            sMap[sid].append(s)
-            # print(s, sid, sMap)
-        return list(sMap.values())
+
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        hashed_words = {}
+        for word in strs:            
+            word_hash = self.hash(word)
+            # print(f"word={word}, hash={word_hash}")
+            if word_hash not in hashed_words:
+                hashed_words[word_hash] = []
+            hashed_words[word_hash].append(word)
+        return [group for group in hashed_words.values()]
