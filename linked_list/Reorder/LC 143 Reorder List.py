@@ -5,52 +5,43 @@
 #         self.next = next
 class Solution:
     def reorderList(self, head: Optional[ListNode]) -> None:
-        """
-        Do not return anything, modify head in-place instead.
-        """
-        def val(p):
-            return p.val if p else None
-        def vals(p):
-            arr = []
-            while p:
-                arr.append(p.val)
-                p = p.next
-            return arr
-        # find mid point
-        slow = head
-        fast = head
-        while fast:
-            slow = slow.next
-            fast = fast.next
-            if fast:
-                fast = fast.next
-        # print(vals(slow))
-        if not slow:
-            return
-        
-        # reverse last half
-        prev = slow
-        mid = slow.next
-        slow.next = None
-        while mid:
-            next = mid.next
-            mid.next = prev
-            prev = mid
-            mid = next        
-        # print(vals(prev))
+        last = head
+        mid = head
 
-        # reorder
-        pHead = head
-        pTail = prev
-        while pTail:
-            head_next = pHead.next
-            tail_next = pTail.next
-            pHead.next = pTail
-            pTail.next = head_next
-            pHead = head_next
-            pTail = tail_next
-            # print(val(pHead), val(pTail))
-        pHead.next = None
+        while last:
+            last = last.next
+            if last:
+                last = last.next
+            else:
+                break                
+            mid = mid.next
+
+        tail = None
+        last = mid
+        while last:
+            nxt = last.next
+            last.next = tail
+            tail = last
+            last = nxt
         
+        cur_head = head
+        cur_tail = tail
+        while cur_tail.next:            
+            next_head = cur_head.next
+            next_tail = cur_tail.next
+            cur_head.next = cur_tail
+            cur_tail.next = next_head
+            cur_head = next_head
+            cur_tail = next_tail
+
         
 
+
+
+        
+
+
+        
+
+
+        
