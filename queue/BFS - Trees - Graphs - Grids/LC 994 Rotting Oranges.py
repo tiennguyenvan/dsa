@@ -1,39 +1,34 @@
 class Solution:
     def orangesRotting(self, grid: List[List[int]]) -> int:
-        freshMap = Counter()       
+        m = len(grid)
+        if not m:
+            return 0
+        n = len(grid[0])
         q = deque()
-        nr = len(grid)
-        nc = len(grid[0])
-        
-        for i in range(nr):
-            for j in range(nc):
-                o = grid[i][j]
-                if o == 0:
+        good = 0        
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    good+=1
+                if grid[i][j] != 2:
                     continue
-                if o == 1:
-                    freshMap[(i,j)] = 1
-                if o == 2:
-                    q.append((i,j))
+                q.append([i, j])
 
         minutes = 0
-        dirs = [(1,0), (-1,0), (0,1), (0,-1)]
-        while q and len(freshMap):
-            ql = len(q)
-            for qi in range(ql):
-                i,j = q.popleft()
-                grid[i][j] = 0
-                for d in dirs:
-                    r, c = i+d[0], j+d[1]                    
-                    if r < 0 or r >= nr or c < 0 or c >= nc:
+        dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]        
+        while q:
+            minutes += 1
+            l = len(q)
+            for i in range(l):
+                x0, y0 = q.popleft()                
+                for dx, dy in dirs:
+                    x1 = x0 + dx
+                    y1 = y0 + dy
+                    if x1 < 0 or x1 >= m or y1 < 0 or y1 >= n or grid[x1][y1] in [0, 2]:
                         continue
-                    if grid[r][c] == 0 :
-                        continue
-                    if grid[r][c] == 1:
-                        del freshMap[(r,c)]
-                        q.append((r,c))
-            if not q: 
-                break
-            minutes+=1           
-        
-        
-        return minutes if len(freshMap) == 0 else -1
+                    grid[x1][y1] = 2
+                    good-=1
+                    q.append([x1, y1])
+        if good:
+            return -1
+        return minutes - 1 if minutes else 0
