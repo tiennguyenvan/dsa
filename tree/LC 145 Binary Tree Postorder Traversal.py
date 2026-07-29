@@ -4,15 +4,12 @@
 #         self.val = val
 #         self.left = left
 #         self.right = right
-class Solution:    
+class Solution:
     def postorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
-        # left -> right -> root                
-        stack = []
-        visited = []
         ret = []
-        last = None
+        stack = []
         cur = root
-
+        last = None
         while cur or stack:
             if cur:
                 stack.append(cur)
@@ -20,13 +17,9 @@ class Solution:
                 continue
             peek = stack[-1]
             if peek.right and peek.right != last:
-                cur = peek.right                
+                cur = peek.right
                 continue
             last = stack.pop()
             ret.append(last.val)
-
+            
         return ret
-            
-            
-
-        
