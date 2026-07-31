@@ -4,46 +4,33 @@
 #         self.val = val
 #         self.left = left
 #         self.right = right
-class Solution_v2: # learned from the accepted one
-    def dfs(self, root: Optional[TreeNode], lower: float, upper: float) -> bool:
-        if not root:
-            return True
-        if not (lower < root.val < upper):
-            return False
-        return (
-            self.dfs(root.left, lower, root.val) 
-            and self.dfs(root.right, root.val, upper)
-        )
+class Info:
+    def __init__(self, isBST, minVal = None, maxVal = None):
+        self.isBST = isBST
+        self.min = minVal
+        self.max = maxVal
+        # print(isBST, minVal, maxVal)
+
+class Solution:
+    def nodeInfo(self, node: Optional[TreeNode]) -> List[int]:
+        minVal = -float('inf')
+        maxVal = float('inf')
+
+        if not node:
+            return None            
+        l = self.nodeInfo(node.left)        
+        r = self.nodeInfo(node.right)
+
+        if not l: l = Info(True, maxVal, minVal)
+        if not r: r = Info(True, maxVal, minVal)                
+
+        return Info(
+            (l.isBST and r.isBST and l.max < node.val < r.min),
+            min(l.min, node.val),
+            max(r.max, node.val)
+        )     
+        
 
     def isValidBST(self, root: Optional[TreeNode]) -> bool:
-        return self.dfs(root, float("-inf"), float("inf"))
-        
-
-class Solution_v1: # this has the same Time Complexity, totally acceptable
-    def minMax(self, root: Optional[TreeNode]) -> (int,int):
-        minVal = root.val
-        maxVal = root.val        
-        if root.left:
-            leftMin, leftMax = self.minMax(root.left)
-            if leftMax >= minVal or leftMax == -float("inf"):
-                return (float("inf"),-float("inf"))            
-            minVal = leftMin
-        if root.right:
-            rightMin, rightMax = self.minMax(root.right)
-            if rightMin <= maxVal or rightMin == float("inf"):
-                return (float("inf"),-float("inf"))
-            maxVal = rightMax
-        
-        return (minVal, maxVal)
-
-        return (0,0)
-    def isValidBST(self, root: Optional[TreeNode]) -> bool:
-        if not root or (not root.left and not root.right):
-            return True        
-        left,right = self.minMax(root)
-        if root.left and left >= root.val:
-            return False
-        if root.right and right <= root.val:
-            return False
-        return True
-        
+        rootBstStat = self.nodeInfo(root)
+        return rootBstStat.isBST
