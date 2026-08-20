@@ -4,6 +4,7 @@ vendor/
 .env
 
 # Build outputs
+__pycache__
 dist/
 build/
 *.exe
