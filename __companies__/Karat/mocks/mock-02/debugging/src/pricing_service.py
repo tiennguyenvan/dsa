@@ -16,7 +16,10 @@ class PricingService:
             product_id,
             segment,
         )
-        discount = segment_discount or product["default_discount_percent"]
+        discount = (
+            segment_discount
+            if segment_discount is not None
+            else product["default_discount_percent"]
+        )
 
         return product["price"] * (100 - discount) // 100
-
