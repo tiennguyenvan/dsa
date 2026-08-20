@@ -18,5 +18,6 @@ Sys Design:
 
 Coding
 - Built-in Functions:
+  - divmod(a,b) = (a//b, a%b)
 - Data Manipulation
 - Object Design (extendable)
