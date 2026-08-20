@@ -1,0 +1,8 @@
+# Users can be classified into groups based on geographical location. Groups may have further subgroups, for example, Europe may be a group, with France and Germany as subgroups, France could have Paris and Nice as further subgroups, and so on.
+# Advertisers may be granted access to a particular group of Users to target their campaigns, and may have their access revoked. When access is either granted or revoked to a particular group, access is granted or revoked for all subgroups as well.
+# Suppose there are k advertisers, and n groups.
+# Design/describe the data structure used to model the groups, advertisers, and the relationship between them
+# Implement the following methods:
+# grant_access(advertiser_id, group_id)
+# revoke_access(advertiser_id, group_id)
+# check_access(advertiser_id, group_id)
