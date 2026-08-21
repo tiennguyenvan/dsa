@@ -28,7 +28,7 @@ Client -> `POST /posts/{postId}/comments`
         - no-store: no one should cache
         - max-age=60: browser TTL
         - s-max-age=300: CDN TTL
-    - Invalidation (costly so TTL wisely): after posting comments, remove GET comments
+    - Invalidation (costly so TTL wisely): after `posting comments`, remove `GET comments`
     - Secrect Origin hdr: used by BE/API Gw to reject traffic that bypass CDN
  * DDOS, WAF 
 
@@ -45,7 +45,8 @@ Block suspicious requests detected by:
         - CSP (`Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none'`): 
         - HttpOnly cookies: when `Set-Cookie: session=abc123; HttpOnly; Secure; SameSite=Lax`
             - `HttpOnly` = js cannot read this cookies
-            - `Secure`: browser sends it through HTTPS
+            - `Secure`: browser sends it through HTTPS 
+            - => so no need Header: Authentication: Bearer <JWT>
  * Banned IPs/Bots
 
 ### API Gateway
@@ -80,11 +81,9 @@ API Gateway offers:
 
 
 ### Database HA (High Availability)
-Primary => (Replication) => Standby, if Primary failover, Standby becomes Primary 
-Also Read DB, Backup DB
-All these are auto by HA manager svc so:
-=> BE points to the new Primary after failover useing same DB hostname
-=> Auto BACKUP, Replica
+`Primary` => (Replication) => `Standby`, if Primary failover, `Standby` becomes Primary 
+* `HA manager`: auto monitor health, failover, promotion (=> BE points to new Primary w same DB hostname)
+* `DBMS`: auto stream trans from `Prim` to `Read Replica`, handle `Backup` (scheduled snapshots, trans logs)
 
 Replication choices:
 * Sync: Prim waits Standby's confirm before commit succeeds: reliable but slow => for important only
@@ -94,11 +93,27 @@ Terms:
  * RPO (Recovery Point Objective): how old data in Standby allowed when getting promoted
  * RTO (Recovery Time Objective): max downtime, otherwise considered failover
 
-### Event queue
-### Async follower fan-out
-### Cache invalidation
-### Observability
+### Event Broker (Kafka, RabbitMQ, AWS SNS + SQS.)
+Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to event brokers and resp 201 immediately. Brokers queue and process afterward
+ * Each broker has multiple topics, each topic has multiple queues, each queue has workers to process. Eg:
+ * CommentCreated Topic:
+   ├→ Noti Queue -> workers -> notify post author/replied users
+   ├→ Feed/Fan-out Queue -> workers -> update follower feeds
+   ├→ Cache Invalidation Queue -> workers -> del comment:post:123 + CDN API Purge: /posts/123/comments
 
+ * Fan-out (distribute event to many affected users):
+     -  Fan-out on write: author creates post, write post to all followers' feed => lot writes if many followers
+     -  Fan-out on read: user open feed, read changes from that user followed => slow read if followed lots
+     -  Hybrid: celeb -> on read, else, on write
+ * Error Handling:
+     - Pass -> ACK 
+     - Fail -> Retry (w Idempotency) -> Fail again -> Dead-Letter Queue (DLQ).
+ * OutboxDB:
+     - BE always saves a copy of `CommentCreated` msg to OutboxDB
+     - So if msg cannot reach brokers (unvailable, BE error after commit, ...)
+       => So later, Outbox worker schedually feeds msgs to Event Brokers to process
+
+--------------------------------------------------------------------------------
 ## CORE CONCEPTS
 ### JWT (JSON Web Token)
   ```
@@ -106,8 +121,10 @@ Terms:
 	=> Authentication server verifies the credentials.
 	=> Authentication server creates the JWT.
 	=> Authentication server signs it using its private key
-  => Responds with: `Set-Cookie: access_token=<JWT>; HttpOnly; Secure; SameSite=Lax; Path=/`
-	=> Browser receives and stores (HttpOnly Cookies) the JWT for API requests.	
+  => Responds:
+      Option 1: Bearer JWT => Client save for API request Header: Authentication: Bearer: <JWT>
+      Option 2: `Set-Cookie: access_token=<JWT>; HttpOnly; Secure; SameSite=Lax; Path=/`
+	      => Browsers saved (HttpOnly Cookies: js cannot read) and auto attach for API requests.	
 	{
    		Header: { 
 			alg: RS256, 
@@ -169,10 +186,23 @@ Terms:
 ### Sensitive-data redaction
  * remove sensitive dat before send to monitoring tools (log, report): JWT, password, credit-card
 
+--------------------------------------------------------------------------------
+## OBSERVIBILITY
+ * LOGS: wat happen (reqId,eventId,route,status,error)
+ * METRICS: sys health
+  - API: traffic, latency, error rates
+  - BE: CPU, Mem, unhealthy instances
+  - DB: connections, slow queries, replica lag (how old standby data vs primary)
+  - Broker: queue depth, fail retries rate, DLQ size (permanent failed msg)
+  - CDN: cache-hit rate
+ * TRACE: fail where: Gateway -> BE -> DB/Broker -> Worker
+  
 ### IaC
-Backend instance
+.... PENDING
 
 
+
+--------------------------------------------------------------------------------
 ## HTTP CODES
 ## 2xx Success Codes
 * 200 OK: Success.
