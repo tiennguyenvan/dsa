@@ -9,9 +9,9 @@
 
 # System design
 
-## Request flow
+## FULL FLOWS
 ### DNS
-Client <=> DNS: convert domain to ips -> real Cloudfront/API Gateway/BE Public addr
+Client <=> DNS: convert domain to ips -> real `CDN` or `API Gateway` or `BE Public` addr
 Client -> `POST /posts/{postId}/comments`
 
 ### CDN
@@ -78,16 +78,28 @@ API Gateway offers:
    - Weighted: strongers (cpu, mem, cap, type, load test) get more traffic.
    - Consistent Hashing: same keys reach same instances
 
-### IaC
-	Backend instance
 
-### Application layer
-### Database write
-### Publish event/queue
-### Response -> 201 Created
-### Async: follower fan-out + cache invalidation
+### Database HA (High Availability)
+Primary => (Replication) => Standby, if Primary failover, Standby becomes Primary 
+Also Read DB, Backup DB
+All these are auto by HA manager svc so:
+=> BE points to the new Primary after failover useing same DB hostname
+=> Auto BACKUP, Replica
 
-## Core concerns
+Replication choices:
+* Sync: Prim waits Standby's confirm before commit succeeds: reliable but slow => for important only
+* Async: Prim commits first, write to Standby later: fast but may lost data
+
+Terms:
+ * RPO (Recovery Point Objective): how old data in Standby allowed when getting promoted
+ * RTO (Recovery Time Objective): max downtime, otherwise considered failover
+
+### Event queue
+### Async follower fan-out
+### Cache invalidation
+### Observability
+
+## CORE CONCEPTS
 ### JWT (JSON Web Token)
   ```
 	User logs in:
@@ -157,10 +169,8 @@ API Gateway offers:
 ### Sensitive-data redaction
  * remove sensitive dat before send to monitoring tools (log, report): JWT, password, credit-card
 
-## Caching
-  * `POST` is normally not cached
-  * Update/invalidate cached reads afterward
-  * Logging, metrics and tracing
+### IaC
+Backend instance
 
 
 ## HTTP CODES
