@@ -14,7 +14,39 @@
 Client <=> DNS: convert domain to ips -> real Cloudfront/API Gateway/BE Public addr
 Client -> `POST /posts/{postId}/comments`
 
-### CloudFront/CDN + DDoS protection
+### CDN
+(CloudFront/Cloudflare)
+ * Caching (media, css, html, js):
+    - Client sends GET, CDN checks its edge cache
+    - Cache hit ? `return` : `call API->cache resp->return`
+ * Cache Data:
+    - Key: (url+query+hdr)
+    - TTL: time-to-live
+    - Cache-control: caching rules returned in hdr from origin: `public, max-age=60, ..`
+        - public: any one can cache
+        - private: only browser can cache, CDN should not
+        - no-store: no one should cache
+        - max-age=60: browser TTL
+        - s-max-age=300: CDN TTL
+    - Invalidation (costly so TTL wisely): after posting comments, remove GET comments
+    - Secrect Origin hdr: used by BE/API Gw to reject traffic that bypass CDN
+ * DDOS, WAF 
+
+### WAF
+`WAF` (Web Application Firewall). Can be attached to CDN or API Gateway
+Block suspicious requests detected by:
+ * SQL injection patterns
+ * `XSS` (Scross Site scripting)
+    - Stored XSS: js in db
+    - Reflected XSS: https://example.com/search?q=<script>...</script> and server render `q` directly into HTML
+    - DOM XSS: if dev do el.innerHTML = location.hash.slice(1) : the it could insert script from url
+    - => 
+        - esc/sanitize content
+        - CSP (`Content-Security-Policy: default-src 'self'; script-src 'self'; object-src 'none'`): 
+        - HttpOnly cookies: when `Set-Cookie: session=abc123; HttpOnly; Secure; SameSite=Lax`
+            - `HttpOnly` = js cannot read this cookies
+            - `Secure`: browser sends it through HTTPS
+ * Banned IPs/Bots
 
 ### API Gateway
 Don't Expose BE directly.
@@ -32,12 +64,8 @@ API Gateway offers:
    * /entityX/* => EntityX BE
  * [Optional] API Contract (OpenAPI/JSON Schema) validation, BE still handle DTO+service call
  * Transformation: eg: "postContent" : {} become "postBody": {} => legacy, matching external, ...
- * WAF (Web Application Firewall):  Block suspicious requests by rules:
-   - SQL injection patterns
-   - X-Site scripting
-   - Banned IPs/Bots
-   - Centralized logging: [requestID, method, route, status, errors, clientId]
-   - API versioning: /v1 -> BE1, /v2 -> BE2
+ * Centralized logging: [requestID, method, route, status, errors, clientId]
+ * API versioning: /v1 -> BE1, /v2 -> BE2
 
 ### Load balancer
  * distribute traffic btw healthy BE instances (GET /health/ready)
@@ -52,6 +80,7 @@ API Gateway offers:
 
 ### IaC
 	Backend instance
+
 ### Application layer
 ### Database write
 ### Publish event/queue
@@ -64,8 +93,9 @@ API Gateway offers:
 	User logs in:
 	=> Authentication server verifies the credentials.
 	=> Authentication server creates the JWT.
-	=> Authentication server signs it using its private key.
-	=> Frontend receives and stores the JWT for API requests.	
+	=> Authentication server signs it using its private key
+  => Responds with: `Set-Cookie: access_token=<JWT>; HttpOnly; Secure; SameSite=Lax; Path=/`
+	=> Browser receives and stores (HttpOnly Cookies) the JWT for API requests.	
 	{
    		Header: { 
 			alg: RS256, 
