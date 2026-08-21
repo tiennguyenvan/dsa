@@ -53,7 +53,7 @@ Block suspicious requests detected by:
 Don't Expose BE directly.
 BE hides in private network, only receive traffic from API Gateway
 API Gateway offers:
- * HTTPS = HTML + TLS (Transport Layer Security, encrypt data) 
+ * HTTPS = HTML + TLS (Transport Layer Security, encrypt data) > old/obsoleted SSL (secure socket layer) 
  * Handle JWT -> claims to BE
  * Rate limiting: 429 (too many requests) if full
    - Token Bucket: cap=10, refill=2/s => general
