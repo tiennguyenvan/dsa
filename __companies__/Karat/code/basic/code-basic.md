@@ -22,7 +22,8 @@ from typing import List, Dict, Set, Tuple, Optional
 from heapq import heappush, heappop, heapify
 from math import inf, ceil, floor, sqrt
 from functools import lru_cache
-
+requests for simple HTTP requests.
+numpy, pandas for advanced data analysis.
 
 No import for
 list, dict, set, tuple

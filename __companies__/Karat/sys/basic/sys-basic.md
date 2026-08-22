@@ -11,11 +11,10 @@
 
 ## FULL FLOWS
 ### DNS
-Client <=> DNS: convert domain to ips -> real `CDN` or `API Gateway` or `BE Public` addr
+Client (Browser <=> DNS: convert domain to ips -> real `CDN` or `API Gateway` or `BE Public` addr)
 Client -> `POST /posts/{postId}/comments`
 
-### CDN
-(CloudFront/Cloudflare)
+### CDN (CloudFront/Cloudflare)
  * Caching (media, css, html, js):
     - Client sends GET, CDN checks its edge cache
     - Cache hit ? `return` : `call API->cache resp->return`
@@ -36,7 +35,7 @@ Client -> `POST /posts/{postId}/comments`
 `WAF` (Web Application Firewall). Can be attached to CDN or API Gateway
 Block suspicious requests detected by:
  * SQL injection patterns
- * `XSS` (Scross Site scripting)
+ * `XSS` (Scross Site Scripting)
     - Stored XSS: js in db
     - Reflected XSS: https://example.com/search?q=<script>...</script> and server render `q` directly into HTML
     - DOM XSS: if dev do el.innerHTML = location.hash.slice(1) : the it could insert script from url
@@ -53,11 +52,14 @@ Block suspicious requests detected by:
 Don't Expose BE directly.
 BE hides in private network, only receive traffic from API Gateway
 API Gateway offers:
- * HTTPS = HTML + TLS (Transport Layer Security, encrypt data) > old/obsoleted SSL (secure socket layer) 
+ * HTTPS = HTTP + TLS (Transport Layer Security, encrypt data, modern protocol) > old SSL (secure socket layer) 
  * Handle JWT -> claims to BE
  * Rate limiting: 429 (too many requests) if full
-   - Token Bucket: cap=10, refill=2/s => general
+   - Token Bucket: cap=10 tokens, refill=2/s (evry sec: add 2 tokens to No tokens left)
+     - 4reqs => 6tokens left, 1s later=> refill so 8tokens left but never above 10
+     - This allow bursts (API Gw send 10 requests at a time but still keep available tokens at 0, allowing cooldown). Token bucket always sends immdidately, not hold
    - Leaky Bucket: qCap=10, processRate=2/s => only if know stable rate.
+     - Hold requests and send to BE at the processRate
    - Fixed Window: cap: 100 reqs/every min (eg: 10:00:00-10:00:59, reset at window end) => for evenly distributed
    - Sliding Window: cap: 100 reqs/last 60s => may require more computation
  * Route matching: for microsvc/seperate concerns
@@ -71,7 +73,8 @@ API Gateway offers:
 ### Load balancer
  * distribute traffic btw healthy BE instances (GET /health/ready)
  * Table: [{ address:"10.0.1.10:8080", status:"healthy", weight:2, activeConnections:20, zone:"zone-a"}, ..]
- * add: autoscaler register new instance, LB check & add to table
+ * activeConnections = how many clients connecting to a BE
+ * add: autoscaler registers new instance => LB check & add to table
  * recover: bad instances receives traffic again if healthy again
  * Distributed Algos:
    - Round Robin: #1 -> #2 -> #1 -> ..
@@ -132,8 +135,8 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
 		},		
    		Payload: { 
 			sub: userId, // the subject
-    		iss: auth.url.com, // trusted issuer issued the JWT
-      		aud: comment-api, // audience: api that will use this JWT
+    	iss: auth.url.com, // trusted issuer issued the JWT
+      aud: comment-api, // audience: api that will use this JWT
 			scope: "comments:read comments:write",
 			iat: issueAt
 			exp: expAt
@@ -155,12 +158,12 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
 	SHA-256: just to create a hash from a data
 	RS256: Uses SHA-256 + RSA: Private key signs, Public key verifies  		
 	HS256 = HMAC-SHA256 using same shared secret for signing + verification.
-	=> RS256 is better when multiple APIs need to verify tokens without receiving the private key.
+	=> RS256 is better when multiple APIs need to verify tokens without sharing the private key (which can be used to fake the signature).
   ```
   
 ### Input validation and authorization
   * Validation:
-	- 0 < Content len < limit
+  	- 0 < Content len < limit
     - Post exists and accepts comments
     - sanitize: supported tags, spam/bad words
     - Use parameterized SQL
@@ -174,7 +177,7 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
    - (could use requestHash(key,payload) to make sure the idempotency key is used for this request)
  * BE save key into db with the comment:
    - Same key + Same Payload -> return original response
-   - Same key + Diff Payload -> 409 Conflict
+   - Same key + Diff Payload (diff hash) -> 409 Conflict
 
 ### Secrets management
  * Sensitive => secrets managers (AWS/Google SM, Azure Key Vault) => controled by IAM
@@ -188,14 +191,21 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
 
 --------------------------------------------------------------------------------
 ## OBSERVIBILITY
- * LOGS: wat happen (reqId,eventId,route,status,error)
+ * LOGS: wat happen (reqId,eventId,route,status,error,clientId)
  * METRICS: sys health
   - API: traffic, latency, error rates
   - BE: CPU, Mem, unhealthy instances
   - DB: connections, slow queries, replica lag (how old standby data vs primary)
   - Broker: queue depth, fail retries rate, DLQ size (permanent failed msg)
   - CDN: cache-hit rate
- * TRACE: fail where: Gateway -> BE -> DB/Broker -> Worker
+ * TRACE: full journey of one request across services using spans collected 
+   * Span = (svc,start_time,duration,status/error,parent_span,route,DB op)
+    Trace ID: abc123
+      Gateway          span01: 20ms
+      └─ Backend       span02: 30ms
+        ├─ Database    span03: 90ms
+        └─ Broker      span04: 50ms
+            └─ Worker  span05: 180ms `<-- SLOW`
   
 ### IaC
 .... PENDING
@@ -222,3 +232,6 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
 * 502 Bad Gateway: Proxy failure.
 * 503 Service Unavailable: Temporary downtime.
 * 504 Gateway Timeout: Network delay.
+
+Practice
+https://www.reddit.com/r/leetcode/comments/1fkf8wg/atlassian_senior_dev_karat_interview_experience/?utm_source=chatgpt.com
