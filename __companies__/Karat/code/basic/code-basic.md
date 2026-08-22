@@ -38,3 +38,8 @@ insert_index = bisect_left(arr,target[,low=0][,hi=n][,key=lambda e: ...])
 
 time_map = TimeMap()
 assert time_map.get('a', 0) == ''
+
+
+Practice
+https://leetcode.com/discuss/post/1742996/palantir-phone-screen-karat-interview-by-s9p7/
+https://leetcode.com/discuss/post/7699523/one-pay-karat-interview-rejected-by-inkb-qiwo/
