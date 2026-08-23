@@ -40,6 +40,23 @@ time_map = TimeMap()
 assert time_map.get('a', 0) == ''
 
 
-Practice
-https://leetcode.com/discuss/post/1742996/palantir-phone-screen-karat-interview-by-s9p7/
+# PRACTICE
+## Debug + Intergration
+https://leetcode.com/discuss/post/5085876/coding-question-on-karat-interview-expie-luc8/
 https://leetcode.com/discuss/post/7699523/one-pay-karat-interview-rejected-by-inkb-qiwo/
+
+## DSA
+### 2025
+https://leetcode.com/discuss/post/1742996/palantir-phone-screen-karat-interview-by-s9p7/
+https://leetcode.com/discuss/post/6483337/atlassian-p40-karat-interview-by-anonymo-9tg2/
+https://leetcode.com/discuss/post/6537260/atlassian-p40-karat-interview-by-anonymo-gabb/
+https://leetcode.com/discuss/post/6529159/atlassian-karat-screening-round-by-anony-fqcx/
+https://leetcode.com/discuss/post/7075294/splunk-cisco-karat-3rd-party-software-en-3qfx/
+https://leetcode.com/discuss/post/7020178/paypal-karat-interview-by-anonymous_user-a5nb/
+https://leetcode.com/discuss/post/6926273/atlassian-p50-karat-stage-by-anonymous_u-yja9/
+https://leetcode.com/discuss/post/6893409/paypal-karat-interview-experience-by-ano-mehn/
+https://leetcode.com/discuss/post/6703481/karat-interview-experience-by-anonymous_-lamw/
+https://leetcode.com/discuss/post/1982184/coinbase-sde2-phone-screen-karat-by-anon-9t60/
+https://leetcode.com/discuss/post/6671660/karat-round-by-anonymous_user-r4np/
+https://leetcode.com/discuss/post/1688427/indeed-karat-phone-interview-word-search-cs3m/
+https://leetcode.com/discuss/post/6939055/atlassian-p40-karat-interview-ds-questio-efmd/

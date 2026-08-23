@@ -233,5 +233,12 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
 * 503 Service Unavailable: Temporary downtime.
 * 504 Gateway Timeout: Network delay.
 
-Practice
-https://www.reddit.com/r/leetcode/comments/1fkf8wg/atlassian_senior_dev_karat_interview_experience/?utm_source=chatgpt.com
+--------------------------------------------------------------------------------
+# PRACTICE
+https://leetcode.com/discuss/post/6671660/karat-round-by-anonymous_user-r4np/
+https://leetcode.com/discuss/post/7075294/splunk-cisco-karat-3rd-party-software-en-3qfx/
+https://leetcode.com/discuss/post/6671660/karat-round-by-anonymous_user-r4np/
+https://leetcode.com/discuss/post/1982184/coinbase-sde2-phone-screen-karat-by-anon-9t60/
+https://leetcode.com/discuss/post/1688427/indeed-karat-phone-interview-word-search-cs3m/
+
+[v] https://www.reddit.com/r/leetcode/comments/1fkf8wg/atlassian_senior_dev_karat_interview_experience/
