@@ -1,25 +1,13 @@
 Mobile Media (aud/vid/img) => ONLINE(Servers) vs OFFLINE (Device) storing. Trade-offs?
 
-1. LATENCY/AVAIL
-	- Online: Network issue => delay, unavail
-	- Offline: instant, always avail
+ONLINE
+- Pros: smaller app, easy update, strong res (mem, cpu)
+- Cons: net issue, consume data/battery for requesting, server cost (BE, CDN, bandwidth)
 
-2. APP SIZE/DEVICE STORAGE
-	- Online: smaller app
-	- Offline: larger => slow installation, limit by device storage
-
-3. CONTENT UPDATES
-	- Online: any time, instant
-	- Offline: resubmit + review => delay
-
-4. SERVER COST
-	- Online: BE, CDN, bandwidth
-	- Offline: zero
-
-5. USER COST
-   - Online: consume user data + battery
-   - Offline: no user data + battery for downloading
+OFFLINE
+- Pros: offline access, no server cost, not user data/battery for requesting
+- Cons: bigger app (slow install), slow update (submit-review), limit res/heat
 
 => Hybrid: 
-	- large/update frequently => Online
-	- essential/small/static => Offline
+	Offline: essential/small/static; quick/basic ana
+	Online => large/update frequently; full/deep ana
