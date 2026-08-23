@@ -111,9 +111,9 @@ Instead of processing related logics, BE send `Event` (eg: `CommentCreated`) to 
  * Error Handling:
      - Pass -> ACK 
      - Fail -> Retry (w Idempotency) -> Fail again -> Dead-Letter Queue (DLQ).
- * OutboxDB:
-     - BE always saves a copy of `CommentCreated` msg to OutboxDB
-     - So if msg cannot reach brokers (unvailable, BE error after commit, ...)
+     -  OutboxDB:
+        - BE always saves a copy of `CommentCreated` msg to OutboxDB
+        - So if msg cannot reach brokers (unvailable, BE error after commit, ...)
        => So later, Outbox worker schedually feeds msgs to Event Brokers to process
 
 --------------------------------------------------------------------------------
