@@ -42,8 +42,8 @@ assert time_map.get('a', 0) == ''
 
 # PRACTICE
 ## Debug + Intergration
-https://leetcode.com/discuss/post/5085876/coding-question-on-karat-interview-expie-luc8/
-https://leetcode.com/discuss/post/7699523/one-pay-karat-interview-rejected-by-inkb-qiwo/
+[v] https://leetcode.com/discuss/post/5085876/coding-question-on-karat-interview-expie-luc8/
+[v] https://leetcode.com/discuss/post/7699523/one-pay-karat-interview-rejected-by-inkb-qiwo/
 
 ## DSA
 ### 2025
