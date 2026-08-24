@@ -3,7 +3,7 @@ ML Inference Svc for Sport News App. Ana for scaling needs for next year?
 => for user recommendation
 
 1. TRAFFIC GROWTH
-	- user growth %, reqs/s => more instances + compute cap
+	- user growth %, reqs/s => more instances 
 	- peak traffic by events/seasons => concurr usrs => auto scale + padding
 
 2. ML INFERENCE
